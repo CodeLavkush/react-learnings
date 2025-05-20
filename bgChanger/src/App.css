@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@layer base{
+  .btn{
+    @apply text-white rounded-2xl w-20 h-full cursor-pointer shadow-xl;
+  }
+}
