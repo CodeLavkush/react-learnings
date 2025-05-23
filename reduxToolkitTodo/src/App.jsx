@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
+import { AddTodo, Todos } from './components'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-        <h1>Redux Toolkit</h1>
+        <div className='w-full px-4 text-center text-white'>
+          <h1>Redux Toolkit</h1>
+          <AddTodo/>
+          <Todos/>
+        </div>
     </>
   )
 }

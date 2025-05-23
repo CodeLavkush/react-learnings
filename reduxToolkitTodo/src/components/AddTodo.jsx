@@ -1,39 +1,70 @@
-import React, { useState } from "react";
-import { useDispatch } from 'react-redux'
-import {addTodo} from '../features/Todo/todoSlice'
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addTodo, updateTodo } from "../features/Todo/todoSlice";
 
 function AddTodo() {
+  const [input, setInput] = useState("");
+  const dispatch = useDispatch();
+  const textfieldRef = useRef(null);
 
-    const [input, setInput] = useState('')
-    const dispatch = useDispatch()
+  const todoToUpdate = useSelector((state) =>
+    state.todos.find((todo) => todo.isUpdate === true)
+  );
 
-    const addTodoHandler = (e)=>{
-        e.preventDefault()
-        dispatch(addTodo(input))
-        setInput('')
+  useEffect(() => {
+    if (todoToUpdate) {
+      setInput(todoToUpdate.text);
+      textfieldRef.current?.focus();
+      textfieldRef.current?.select();
+    } else {
+      setInput("");
     }
-    return (
-        <div className="w-full px-2">
-        <form
-            onSubmit={addTodoHandler}
-            className="flex flex-wrap sm:flex-nowrap items-center w-full gap-2"
+  }, [todoToUpdate]);
+
+  const addTodoHandler = (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    dispatch(addTodo(input.trim()));
+    setInput("");
+  };
+
+  const updateTodoHandler = (e) => {
+    e.preventDefault();
+    if (!input.trim() || !todoToUpdate) return;
+    dispatch(updateTodo({ id: todoToUpdate.id, text: input.trim() }));
+    setInput("");
+  };
+
+  return (
+    <form
+      className="space-x-3 mt-12"
+      onSubmit={todoToUpdate ? updateTodoHandler : addTodoHandler}
+    >
+      <input
+        type="text"
+        className="bg-gray-800 rounded border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-900 text-base outline-none text-gray-100 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+        placeholder="Enter a Todo..."
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        ref={textfieldRef}
+      />
+      {todoToUpdate ? (
+        <button
+          type="submit"
+          className="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
         >
-            <input
-            type="text"
-            className="flex-1 rounded-sm border border-white shadow-2xl p-2 bg-gray-800 text-white placeholder-gray-400 outline-none"
-            placeholder="Write your todo"
-            value={todo}
-            onChange={(e) => setTodo(e.target.value)}
-            />
-            <button
-            type="submit"
-            className="rounded-sm p-2 w-full sm:w-24 bg-amber-600 text-white cursor-pointer active:scale-95 shadow-2xl hover:bg-amber-800 transition-all"
-            >
-            Add
-            </button>
-        </form>
-        </div>
-    );
+          Update Todo
+        </button>
+      ) : (
+        <button
+          type="submit"
+          className="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
+        >
+          Add Todo
+        </button>
+      )}
+    </form>
+  );
 }
 
 export default AddTodo;
